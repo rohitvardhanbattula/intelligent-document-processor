@@ -4,11 +4,12 @@ import { DocumentFile, TrainingRules, Document, UsageMetadata, LineItem, Extract
 import { loadSettings } from "./settingsService";
 import { extractLocally } from "./localExtractionService";
 
-const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+const ai = new GoogleGenAI({ apiKey: import.meta.env.VITE_GEMINI_API_KEY || '' });
 
 export const fileToBase64 = (file: File): Promise<string> => {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
+    
     reader.readAsDataURL(file);
     reader.onload = () => resolve((reader.result as string).split(',')[1]);
     reader.onerror = error => reject(error);
