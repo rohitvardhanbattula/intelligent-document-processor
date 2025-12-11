@@ -1,0 +1,5 @@
+{
+  "name": "Intelligent Document Processor",
+  "description": "An application for AI-powered document processing. Allows trainers to define parsing and mapping rules using natural language and visual tools. End-users can upload documents, review AI-extracted data, and post results to target systems.",
+  "requestFramePermissions": []
+}
