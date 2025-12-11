@@ -1,0 +1,18 @@
+{
+  "authenticationMethod": "route",
+  "routes": [
+    {
+      "source": "^/?sap/(.*)$",
+      "target": "/sap/$1",
+      "destination": "demo_destination",
+      "authenticationType": "none",
+      "csrfProtection": false
+    },
+    {
+      "source": "^/(.*)$",
+      "target": "$1",
+      "localDir": "webapp",
+      "authenticationType": "none"
+    }
+  ]
+}

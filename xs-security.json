@@ -1,0 +1,22 @@
+
+{
+  "xsappname": "intelligent-document-ui",
+  "tenant-mode": "dedicated",
+  "scopes": [
+    {
+      "name": "$XSAPPNAME.User",
+      "description": "Basic user scope"
+    }
+  ],
+  "role-templates": [
+    {
+      "name": "User",
+      "description": "Basic user role",
+      "scope-references": [
+        "$XSAPPNAME.User"
+      ]
+    }
+  ],
+  "attributes": [],
+  "authorities-inheritance": false
+}

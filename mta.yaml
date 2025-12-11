@@ -1,0 +1,60 @@
+_schema-version: "3.2"
+ID: intelligent-document-ui
+version: 1.0.0
+description: "Inteligent document Application"
+parameters:
+  enable-parallel-deployments: true
+
+build-parameters:
+  before-all:
+    - builder: custom
+      commands:
+        - npm ci
+        - npm run build
+
+modules:
+  - name: intelligent-document-approuter
+    type: approuter.nodejs
+    path: approuter
+    parameters:
+      disk-quota: 512M
+      memory: 512M
+    requires:
+      - name: intelligent-document-destination
+      - name: intelligent-document-uaa
+    build-parameters:
+      builder: npm
+      ignore:
+        - default-*.json
+        - .gitignore
+        - package-lock.json
+
+  - name: intelligent-document-ui
+    type: html5
+    path: .
+    build-parameters:
+      builder: custom
+      commands:
+        - npm ci
+        - npm run build
+        - mkdir -p approuter/webapp
+        - cp -r dist/. approuter/webapp/
+      supported-platforms: []
+      build-result: dist
+
+resources:
+  - name: intelligent-document-destination
+    type: org.cloudfoundry.managed-service
+    parameters:
+      service: destination
+      service-plan: lite
+
+  - name: intelligent-document-uaa
+    type: org.cloudfoundry.managed-service
+    parameters:
+      service: xsuaa
+      service-plan: application
+      path: ./xs-security.json
+      config:
+        xsappname: intelligent-document-ui
+        tenant-mode: dedicated   
