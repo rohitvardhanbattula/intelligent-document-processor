@@ -22,6 +22,7 @@ modules:
     requires:
       - name: intelligent-document-destination
       - name: intelligent-document-uaa
+      - name: intelligent-document-secrets
     build-parameters:
       builder: npm
       ignore:
@@ -58,3 +59,5 @@ resources:
       config:
         xsappname: intelligent-document-ui
         tenant-mode: dedicated   
+  - name: intelligent-document-secrets
+    type: org.cloudfoundry.existing-service

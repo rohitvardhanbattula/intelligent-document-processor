@@ -4,7 +4,25 @@ import { DocumentFile, TrainingRules, Document, UsageMetadata, LineItem, Extract
 import { loadSettings } from "./settingsService";
 import { extractLocally } from "./localExtractionService";
 
-const ai = new GoogleGenAI({ apiKey: import.meta.env.VITE_GEMINI_API_KEY || '' });
+let aiInstance: GoogleGenAI | null = null;
+
+const getAiInstance = async (): Promise<GoogleGenAI> => {
+    if (aiInstance) return aiInstance;
+
+    try {
+        const response = await fetch('/get-gemini-key');
+        if (!response.ok) throw new Error("Failed to fetch API Key from server");
+        
+        const data = await response.json();
+        if (!data.key) throw new Error("API Key is missing in VCAP_SERVICES");
+
+        aiInstance = new GoogleGenAI({ apiKey: data.key });
+        return aiInstance;
+    } catch (e) {
+        console.error("Gemini Authorization Error", e);
+        throw new Error("Could not initialize AI Engine. Ensure 'intelligent-document-secrets' service is bound.");
+    }
+};
 
 export const fileToBase64 = (file: File): Promise<string> => {
   return new Promise((resolve, reject) => {
@@ -145,7 +163,7 @@ const buildSchema = (rules: TrainingRules) => {
 const extractWithGeminiCloud = async (document: Document, rules: TrainingRules) => {
   const modelName = 'gemini-2.5-flash';
   const responseSchema = buildSchema(rules);
-  
+  const ai = await getAiInstance();
   // 1. BASE EXTRACTION
   const baseSystemInstruction = `
     You are an intelligent document processing agent specializing in complex Purchase Orders and Sales Orders.
@@ -318,6 +336,8 @@ export const refineDataWithFeedback = async (
     updatedUnmappedData: { key: string; value: string | number }[];
     suggestedRule: string; 
   }> => {
+
+    const ai = await getAiInstance();
   
     // OPTIMIZATION: Instruct model to only return changed fields to avoid timeout on large line items
     const systemInstruction = `
